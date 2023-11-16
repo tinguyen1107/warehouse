@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +32,6 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
         }
       ]
-
     ]
   }
 }

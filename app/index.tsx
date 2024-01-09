@@ -1,14 +1,25 @@
 import { BarCodeEvent, BarCodeScanner } from "expo-barcode-scanner";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SafeAreaView, Text, View, Dimensions } from "react-native";
 import ScanFrame from "../assets/images/scan-frame.svg";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { ProductPreview } from "../components";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
+const BARCODE_PREFIX = "ABC-abc-";
+
 export default function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean>();
   const [scanned, setScanned] = useState(false);
+  const [scannedData, setScannedData] = useState<number | null>(null);
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => [70, "60%"], []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -20,9 +31,12 @@ export default function ScanScreen() {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }: BarCodeEvent) => {
-    setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    console.log(`Scanned ${type} ${data}`);
+    console.log("Scanned", type, data);
+    if (data.startsWith(BARCODE_PREFIX)) {
+      setScannedData(
+        Number.parseInt(data.replace(new RegExp("^" + BARCODE_PREFIX), "")),
+      );
+    }
   };
 
   if (hasPermission === null) {
@@ -43,7 +57,7 @@ export default function ScanScreen() {
         }}
       >
         <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          onBarCodeScanned={handleBarCodeScanned}
           style={{
             flex: 1,
             backgroundColor: "blue",
@@ -88,6 +102,16 @@ export default function ScanScreen() {
           </Text>
         </View>
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+      >
+        <View style={styles.contentContainer}>
+          {scannedData && <ProductPreview id={scannedData} />}
+        </View>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -97,5 +121,8 @@ const styles = {
   opacity: {
     flex: 1,
     backgroundColor: opacity,
+  },
+  contentContainer: {
+    paddingHorizontal: 30,
   },
 };

@@ -1,10 +1,12 @@
 import { Tabs } from "expo-router";
 import { ReactNode } from "react";
-import { Image, SafeAreaView } from "react-native";
+import { Image } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { DropdownComponent } from "../components";
 import { Icon } from "react-native-elements";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+import { apolloClient } from "../libs/graphql";
+import { ApolloProvider } from "@apollo/client";
 
 function LogoTitle(props: { url: string }): ReactNode {
   return (
@@ -27,56 +29,62 @@ const data = [
 
 export default function Layout() {
   return (
-    <SafeAreaProvider>
-      <Tabs>
-        <Tabs.Screen
-          name="index"
-          options={{
-            tabBarLabel: "Scan",
-            tabBarIcon: (props) => (
-              // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
-              <Icon name="line-scan" type="material-community" {...props} />
-            ),
-            headerTransparent: true,
-            headerLeft: (props) => (
-              <DropdownComponent
-                placeholder="Default camera"
-                items={data}
-                onSelected={(item) => {
-                  console.log(20125117, "switch camera", item);
-                }}
-              />
-            ),
-            ...tabBarGeneralConfig,
-            headerTitle: () => <></>,
-          }}
-        />
-        <Tabs.Screen
-          name="history/index"
-          options={{
-            tabBarLabel: "History",
-            tabBarIcon: (props) => (
-              // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
-              <Icon name="clock-outline" type="material-community" {...props} />
-            ),
-            headerTitle: "Scan history",
-            headerShadowVisible: true,
-            ...tabBarGeneralConfig,
-          }}
-        />
-        <Tabs.Screen
-          name="settings/index"
-          options={{
-            tabBarLabel: "Settings",
-            tabBarIcon: (props) => (
-              // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
-              <Icon name="cog-outline" type="material-community" {...props} />
-            ),
-            headerTitle: "Settings",
-            ...tabBarGeneralConfig,
-          }}
-        />
-      </Tabs>
-    </SafeAreaProvider>
+    <ApolloProvider client={apolloClient}>
+      <SafeAreaProvider>
+        <Tabs>
+          <Tabs.Screen
+            name="index"
+            options={{
+              tabBarLabel: "Scan",
+              tabBarIcon: (props) => (
+                // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
+                <Icon name="line-scan" type="material-community" {...props} />
+              ),
+              headerTransparent: true,
+              headerLeft: (props) => (
+                <DropdownComponent
+                  placeholder="Default camera"
+                  items={data}
+                  onSelected={(item) => {
+                    console.log(20125117, "switch camera", item);
+                  }}
+                />
+              ),
+              ...tabBarGeneralConfig,
+              headerTitle: () => <></>,
+            }}
+          />
+          <Tabs.Screen
+            name="history/index"
+            options={{
+              tabBarLabel: "History",
+              tabBarIcon: (props) => (
+                // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
+                <Icon
+                  name="clock-outline"
+                  type="material-community"
+                  {...props}
+                />
+              ),
+              headerTitle: "Scan history",
+              headerShadowVisible: true,
+              ...tabBarGeneralConfig,
+            }}
+          />
+          <Tabs.Screen
+            name="settings/index"
+            options={{
+              tabBarLabel: "Settings",
+              tabBarIcon: (props) => (
+                // <LogoTitle url="https://reactnative.dev/img/tiny_logo.png" />
+                <Icon name="cog-outline" type="material-community" {...props} />
+              ),
+              headerTitle: "Settings",
+              ...tabBarGeneralConfig,
+            }}
+          />
+        </Tabs>
+      </SafeAreaProvider>
+    </ApolloProvider>
   );
 }
